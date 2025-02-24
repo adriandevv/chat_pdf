@@ -12,13 +12,19 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
+import uuid4 from "uuid4";
 
 const UploadPdf = ({ children }) => {
     const generatedUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
+    const addFileEntry = useMutation(api.fileStorage.AddFileEntryToDb);
+    const getFileUrl = useMutation(api.fileStorage.getFileUrl);
+    const { user } = useUser();
     const [file, setFile] = useState();
+    const [fileName, setFileName] = useState();
     const [loading, setLoading] = useState(false);
 
 
@@ -38,8 +44,19 @@ const UploadPdf = ({ children }) => {
         });
         const { storageId } = await result.json();
         console.log("Uploaded file to storage ID", storageId);
+        const fileId = uuid4();
+        const fileUrl = await getFileUrl({ storageId });
+        // Step 3: Save the storage ID to the database
+        const res = await addFileEntry({
+            fileId,
+            storageId,
+            fileName: fileName ?? 'untitled File',
+            createdBy: user?.primaryEmailAddress?.emailAddress,
+            fileUrl
+        });
+        console.log("Added file to database", res);
+
         setLoading(false);
-        file.current.value = "";
     };
 
     return (
@@ -57,7 +74,7 @@ const UploadPdf = ({ children }) => {
                             </div>
                             <div className="mt-2">
                                 <label>Nombre archivo *</label>
-                                <Input placeholder="Nombre archivo" />
+                                <Input placeholder="Nombre archivo" onChange={(e) => setFileName(e.target.value)} />
                             </div>
                         </div>
                     </DialogDescription>
