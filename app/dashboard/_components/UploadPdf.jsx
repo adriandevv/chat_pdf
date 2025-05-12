@@ -18,7 +18,8 @@ import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import uuid4 from "uuid4";
 
-const UploadPdf = ({ children }) => {
+const UploadPdf = () => {
+  const [openDialog, setOpenDialog] = useState(false);
   const generatedUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
   const addFileEntry = useMutation(api.fileStorage.AddFileEntryToDb);
   const getFileUrl = useMutation(api.fileStorage.getFileUrl);
@@ -57,17 +58,22 @@ const UploadPdf = ({ children }) => {
     const apiResp = await fetch(`/api/pdf-loader?pdfUrl=${fileUrl}`);
     const data = await apiResp.json();
     console.log(data);
-    const embededResult =await embeddDocument({
+    const embededResult = await embeddDocument({
       splitText: data.result,
       fileId: fileId,
     });
     console.log(embededResult);
     setLoading(false);
+    setOpenDialog(false);
   };
 
   return (
     <Dialog className={"w-full"}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button className="w-full" onClick={() => setOpenDialog(true)}>
+          + Subir PDF
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Subir Archivos Pdf</DialogTitle>
@@ -97,7 +103,7 @@ const UploadPdf = ({ children }) => {
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="submit" onClick={OnUpload}>
+          <Button type="submit" onClick={OnUpload} disabled={loading}>
             {loading ? <Loader2Icon className="animate-spin" /> : "Guardar"}
           </Button>
         </DialogFooter>

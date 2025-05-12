@@ -11,11 +11,7 @@ const SideBar = () => {
     <div className='shadow-lg h-screen p-7'>
       <Image src={'/logo.svg'} alt='logo' width={200} height={200} />
       <div className='mt-10'>
-        <UploadPdf>
-          <Button  className='w-full'  >
-            + Subir PDF
-          </Button>
-        </UploadPdf>
+        <UploadPdf/>
         <div className='flex gap-2 items-center p-3 mt-5 hover:bg-slate-100 rounded-lg cursor-pointer' >
           <Layout />
           <h2>

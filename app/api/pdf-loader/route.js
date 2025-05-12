@@ -8,6 +8,7 @@ export async function GET (req){
     const reqUrl = req.url;
     const {searchParams} = new URL(reqUrl);
     const pdfURL = searchParams.get('pdfUrl');
+    console.log(pdfURL);    
     //1. Load the PDF from the URL
     const response = await fetch(pdfURL);
     const data = await response.blob();
